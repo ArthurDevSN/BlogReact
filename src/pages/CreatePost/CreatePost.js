@@ -15,18 +15,19 @@ const CreatePost = () => {
 
   const {user} = useAuthValue();
 
-  const [insertDocument, response] = useInsertDocument();
+  const {insertDocument, response} = useInsertDocument("post");
 
   const HandleSubmit = (e) => {
     e.preventDefault();
     setFormError("");
 
+    try{
+      new URL(image)
+    } catch (error) {
+      setFormError("A imagem precisa ser uma URL")
+    }
 
-    // validate image URL
-
-    // criar o array de tags
-
-    //checar todos os valores
+    if(formError) return;
 
     insertDocument({
       title,
@@ -83,6 +84,7 @@ const CreatePost = () => {
        {!response.loading && <button className='btn'>Cadastrar</button>}
         {response.loading && (<button className='btn' disabled>Aguarde...</button>)}
         {response.error && <p className="error">{response.error}</p>}
+        {formError && <p className="error">{formError}</p>}
     </form>
     </div>
   );
