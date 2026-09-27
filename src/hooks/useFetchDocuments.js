@@ -27,19 +27,25 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
 
                 if (search) {
 
-                q = await query(collectionRef, 
-                    where("tagsArray", "array-contains", search),
-                    orderBy("createdAt", "asc")
-                
-                );
+                    q = await query(collectionRef,
+                        where("tagsArray", "array-contains", search),
+                        orderBy("createdAt", "asc")
 
-                } 
-                
+                    );
+
+                } else if (uid) {
+                    
+                    q = await query(collectionRef,
+                        where("uid", "==", uid),
+                        orderBy("createdAt", "asc")
+
+                    );
+
+                }
+
                 else {
                     q = await query(collectionRef, orderBy("createdBy", "desc"));
                 }
-
-
 
                 await onSnapshot(q, (querySnapshot) => {
 
