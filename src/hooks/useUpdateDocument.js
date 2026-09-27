@@ -5,7 +5,6 @@ import { updateDoc, doc } from "firebase/firestore";
 const initialState = {
     loading: null,
     error: null
-
 }
 
 const updateReducer = (state, action) => {
