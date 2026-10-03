@@ -34,12 +34,24 @@ export const useFetchDocuments = (docCollection, search = null, uid = null) => {
                     );
 
                 } else if (uid) {
-                    
+
                     q = await query(collectionRef,
                         where("uid", "==", uid),
                         orderBy("createdAt", "asc")
 
                     );
+
+                    await onSnapshot(q, (querySnapshot) => {
+
+                    setDocuments(
+                        querySnapshot.docs.map((doc) => ({
+                            id: doc.id,
+                            ...doc.data(),
+                        }))
+                    );
+                });
+
+
 
                 }
 
