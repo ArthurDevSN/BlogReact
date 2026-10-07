@@ -19,7 +19,7 @@ const Post = () => {
                 <>
                     <h1>{post.title}</h1>
                     <img src={post.image} alt={post.title}></img>
-                    <p>{post.doby}</p>
+                    <p>{post.body}</p>
                     <h3>Este post trata sobre:</h3>
                     <div className={styles.tags}>
                     {post.tagsArray.map((tag) => (

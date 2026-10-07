@@ -26,17 +26,18 @@ const CreatePost = () => {
     try{
       new URL(image)
     } catch (error) {
-      setFormError("A imagem precisa ser uma URL")
+      setFormError("A imagem precisa ser uma URL");
+      return;
     }
 
     const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
 
     if (!title || !image|| !tags|| !body) {
       setFormError("Por favor, preencha todos os campos!");
+      return;
     }
       
 
-    if(formError) return;
 
     insertDocument({
       title,

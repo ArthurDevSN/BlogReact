@@ -10,7 +10,7 @@ import { useUpdateDocument } from '../../hooks/useUpdateDocument';
 const EditPost = () => {
 
   const { id } = useParams()
-  const { document: post } = useFetchDocument("posts", id);
+  const { document: post } = useFetchDocument("post", id);
 
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -45,17 +45,18 @@ const EditPost = () => {
     try {
       new URL(image)
     } catch (error) {
-      setFormError("A imagem precisa ser uma URL")
+      setFormError("A imagem precisa ser uma URL");
+      return;
     }
 
     const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
 
     if (!title || !image || !tags || !body) {
       setFormError("Por favor, preencha todos os campos!");
+      return;
     }
 
 
-    if (formError) return;
 
     const data = {
       title,
