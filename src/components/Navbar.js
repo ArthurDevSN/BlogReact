@@ -10,28 +10,29 @@ import styles from './Navbar.module.css';
 const Navbar = () => {
 
   const { user } = useAuthValue();
-  const {logout} = useAuthentication();
+  const { logout, loading, error } = useAuthentication();
 
   return (
+    <header>
     <nav className={styles.navbar} aria-label="Navegação principal">
       <NavLink to="/" className={styles.brand}>
         mini <span>Blog</span>
       </NavLink>
       <ul className={styles.links_list}>
         <li>
-          <NavLink to="/" className={({ isActive }) => (isActive ? styles.active : "")}>
+          <NavLink to="/" end className={({ isActive }) => (isActive ? styles.active : "")}>
             Home
           </NavLink>
         </li>
         {!user && (
           <>
             <li>
-              <NavLink to="/Register" className={({ isActive }) => (isActive ? styles.active : "")}>
+              <NavLink to="/register" className={({ isActive }) => (isActive ? styles.active : "")}>
                 Cadastrar
               </NavLink>
             </li>
             <li>
-              <NavLink to="/Login" className={({ isActive }) => (isActive ? styles.active : "")}>
+              <NavLink to="/login" className={({ isActive }) => (isActive ? styles.active : "")}>
                 Login
               </NavLink>
 
@@ -60,11 +61,15 @@ const Navbar = () => {
         </li>
         {user && (
           <li>
-            <button onClick={logout}>Sair</button>
+            <button type="button" onClick={logout} disabled={loading} aria-busy={loading}>
+              {loading ? 'Saindo...' : 'Sair'}
+            </button>
           </li>
         )}
       </ul>
     </nav>
+    {error && <p className={styles.logout_error} role="alert">{error}</p>}
+    </header>
   );
 }
 

@@ -6,12 +6,12 @@
     overflow-wrap: anywhere;
 }
 
-.about h2 {
+.about h1 {
     font-size: clamp(1.35rem, 5vw, 1.5rem);
 }
 
 .about p{
-    color: #aaa;
+    color: #626b73;
     margin-bottom: 2em;
     max-width: 42rem;
     line-height: 1.6;

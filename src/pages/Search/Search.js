@@ -1,37 +1,36 @@
 import styles from './Search.module.css';
-
+import { Link } from 'react-router-dom';
 import { useFetchDocuments } from '../../hooks/useFetchDocuments';
 import { useQuery } from '../../hooks/useQuery';
-
-// components
-
 import PostDetail from '../../components/PostDetail';
 
-import { Link } from 'react-router-dom';
+const SearchResults = ({ search }) => {
+  const { documents: posts, loading, error, fromCache } = useFetchDocuments('post', search);
 
+  return (
+    <div aria-busy={loading}>
+      {loading && <p role="status">Buscando posts...</p>}
+      {error && <p className="error" role="alert">{error}</p>}
+      {!loading && !error && fromCache && <p role="status">{posts?.length ? 'Mostrando posts salvos neste navegador. Eles podem estar desatualizados.' : 'Aguardando confirmação dos posts. Verifique sua conexão se a espera continuar.'}</p>}
+      {!loading && !error && !fromCache && posts?.length === 0 && (
+        <p role="status">Não foram encontrados posts para esta tag.</p>
+      )}
+      {!loading && !error && posts?.map((post) => <PostDetail key={post.id} post={post} />)}
+    </div>
+  );
+};
 
 const Search = () => {
-    const params = useQuery();
-    const search = params.get("q")
+  const params = useQuery();
+  const search = (params.get('q') || '').trim().toLowerCase();
 
-    const { documents: posts } = useFetchDocuments("post", search);
-
-    return (
-        <div className={styles.search_container}>
-            <h2>Search</h2>
-            <div>
-                {posts && posts.lenght === 0 && (
-                <>
-                    <p>Não foram encontrados posts a partir da sua busca...</p>
-                    <Link to="/" className="btn btn-dark">
-                        Voltar
-                    </Link>
-                </>
-                )}
-                {posts && posts.map((post) => <PostDetail key={post.id} post={post} />)}
-            </div>
-        </div>
-    );
-}
+  return (
+    <div className={styles.search_container}>
+      <h1>{search ? `Resultados para: ${search}` : 'Buscar posts'}</h1>
+      {search ? <SearchResults key={search} search={search} /> : <p>Informe uma tag na busca da página inicial.</p>}
+      <Link to="/" className="btn btn-dark">Voltar para o início</Link>
+    </div>
+  );
+};
 
 export default Search;

@@ -19,7 +19,7 @@
     white-space: pre-wrap;
 }
 
-.post_container h3 {
+.post_container h2 {
     margin-bottom: .2em;
 }
 
@@ -28,6 +28,11 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.5em 1em;
+    margin-bottom: 1.5em;
+}
+
+.tags a {
+    padding: .5em;
 }
 
 .tags p{

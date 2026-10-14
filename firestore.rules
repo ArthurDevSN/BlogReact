@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validTag(tags, index) {
+      return tags.size() <= index
+        || (tags[index] is string && tags[index].size() > 0 && tags[index].size() <= 50);
+    }
+
+    function validPost(data) {
+      return data.keys().hasAll(['title', 'image', 'body', 'tagsArray', 'uid', 'createdBy', 'createdAt'])
+        && data.keys().hasOnly(['title', 'image', 'body', 'tagsArray', 'uid', 'createdBy', 'createdAt'])
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.image is string && data.image.size() <= 2048 && data.image.matches('https?://.+')
+        && data.body is string && data.body.size() > 0 && data.body.size() <= 50000
+        && data.uid is string
+        && data.createdBy is string && data.createdBy.size() > 0 && data.createdBy.size() <= 80
+        && data.createdAt is timestamp
+        && data.tagsArray is list && data.tagsArray.size() > 0 && data.tagsArray.size() <= 20
+        && data.tagsArray.toSet().size() == data.tagsArray.size()
+        && validTag(data.tagsArray, 0)
+        && validTag(data.tagsArray, 1)
+        && validTag(data.tagsArray, 2)
+        && validTag(data.tagsArray, 3)
+        && validTag(data.tagsArray, 4)
+        && validTag(data.tagsArray, 5)
+        && validTag(data.tagsArray, 6)
+        && validTag(data.tagsArray, 7)
+        && validTag(data.tagsArray, 8)
+        && validTag(data.tagsArray, 9)
+        && validTag(data.tagsArray, 10)
+        && validTag(data.tagsArray, 11)
+        && validTag(data.tagsArray, 12)
+        && validTag(data.tagsArray, 13)
+        && validTag(data.tagsArray, 14)
+        && validTag(data.tagsArray, 15)
+        && validTag(data.tagsArray, 16)
+        && validTag(data.tagsArray, 17)
+        && validTag(data.tagsArray, 18)
+        && validTag(data.tagsArray, 19)
+        ;
+    }
+
+    match /post/{postId} {
+      allow read: if true;
+      allow create: if signedIn()
+        && validPost(request.resource.data)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && validPost(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'image', 'body', 'tagsArray']);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+  }
+}

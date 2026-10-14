@@ -20,7 +20,7 @@
 }
 
 .post_detail h2 {
-    margin-bottom: 4em;
+    margin-bottom: .5em;
     max-width: 100%;
 }
 
@@ -44,9 +44,10 @@
     max-width: 100%;
 }
 
-.tags p {
+.tags a {
     min-width: 0;
     max-width: 100%;
+    padding: .4em;
 }
 
 .tags span {

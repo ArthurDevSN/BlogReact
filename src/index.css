@@ -8,13 +8,15 @@ body {
   background-color: #f6fcff;
   padding:0;
   margin: 0;
-  font-family: "Montserrat", sans-serif;
+  font-family: "Montserrat", system-ui, sans-serif;
+  color: #1f2933;
+  line-height: 1.5;
 }
 
 input::placeholder,
 textarea::placeholder {
   font-family: "Montserrat", sans-serif;
-  color: #aaa;
+  color: #626b73;
 }
 
 input:focus-visible,
@@ -39,7 +41,7 @@ nav button{
 
 a:hover,
 nav button:hover{
-  color: #bbb;
+  color: #0f730c;
 }
 
 form{
@@ -127,6 +129,11 @@ img {
 
 button[disabled] {
   background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.container p.error {
+  color: #721c24;
 }
 
 .container .error {

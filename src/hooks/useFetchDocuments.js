@@ -1,92 +1,70 @@
-import { useState, useEffect } from "react";
-import { db } from "../firebase/config"
-import { collection, query, orderBy, onSnapshot, where, QuerySnapshot } from "firebase/firestore";
-
+import { useEffect, useState } from "react";
+import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { firestoreError } from "../utils/firestoreError";
 
 export const useFetchDocuments = (docCollection, search = null, uid = null) => {
+  const [documents, setDocuments] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [fromCache, setFromCache] = useState(false);
 
-    const [documents, setDocuments] = useState(null)
-    const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(null)
+  useEffect(() => {
+    let active = true;
+    let unsubscribe;
 
-    // deal with memory leak
-    const [cancelled, setCancelled] = useState(false)
+    setDocuments(null);
+    setError(null);
+    setLoading(true);
+    setFromCache(false);
 
-    useEffect(() => {
+    const handleError = (fetchError) => {
+      if (!active) return;
+      setDocuments(null);
+      setError(firestoreError(fetchError, "Não foi possível carregar os posts. Tente novamente."));
+      setLoading(false);
+      setFromCache(false);
+    };
 
-        async function loadData() {
-            if (cancelled) return
+    try {
+      const constraints = [];
 
-            setLoading(true)
+      if (search) {
+        constraints.push(where("tagsArray", "array-contains", search));
+      } else if (uid) {
+        constraints.push(where("uid", "==", uid));
+      }
 
-            const collectionRef = await collection(db, docCollection)
+      constraints.push(orderBy("createdAt", "desc"));
 
-            try {
+      const documentsQuery = query(collection(db, docCollection), ...constraints);
+      unsubscribe = onSnapshot(
+        documentsQuery,
+        { includeMetadataChanges: true },
+        (snapshot) => {
+          if (!active) return;
 
-                let q;
+          setDocuments(
+            snapshot.docs.map((document) => ({
+              ...document.data(),
+              id: document.id,
+            }))
+          );
+          setError(null);
+          setLoading(false);
+          setFromCache(Boolean(snapshot.metadata?.fromCache));
+        },
+        handleError
+      );
+    } catch (fetchError) {
+      handleError(fetchError);
+    }
 
-                if (search) {
+    return () => {
+      active = false;
+      if (unsubscribe) unsubscribe();
+    };
+  }, [docCollection, search, uid]);
 
-                    q = await query(collectionRef,
-                        where("tagsArray", "array-contains", search),
-                        orderBy("createdAt", "asc")
-
-                    );
-
-                } else if (uid) {
-
-                    q = await query(collectionRef,
-                        where("uid", "==", uid),
-                        orderBy("createdAt", "asc")
-
-                    );
-
-                    await onSnapshot(q, (querySnapshot) => {
-
-                    setDocuments(
-                        querySnapshot.docs.map((doc) => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        }))
-                    );
-                });
-
-
-
-                }
-
-                else {
-                    q = await query(collectionRef, orderBy("createdBy", "desc"));
-                }
-
-                await onSnapshot(q, (querySnapshot) => {
-
-                    setDocuments(
-                        querySnapshot.docs.map((doc) => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        }))
-                    );
-                });
-
-                setLoading(false)
-
-            } catch (error) {
-                console.log(error);
-                setError(error.message);
-
-                setLoading(false);
-            }
-        }
-
-        loadData();
-
-    }, [docCollection, search, uid, cancelled]);
-
-    useEffect(() => {
-        return () => setCancelled(true);
-    }, []);
-
-    return { documents, loading, error };
-}
-
+  return { documents, loading, error, fromCache };
+};
