@@ -6,19 +6,32 @@
 
     text-align: center;
     width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.home h1 {
+    font-size: clamp(1.65rem, 5vw, 2rem);
+}
+
+.home > div {
+    width: 100%;
+    max-width: 600px;
 }
 
 .search-form{
-    max-width: 100%;
-    width: 60%;
+    max-width: 640px;
+    width: 100%;
     display: flex;
+    gap: 10px;
     justify-content: center;
     margin-bottom: 2em;
 }
 
 .search-form input{
-    margin-right: 10px;
-    width: 50%;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
 }
 
 .noposts{
@@ -31,4 +44,14 @@
 
 .noposts a {
     padding: 10px 25px;
+}
+
+@media (max-width: 480px) {
+    .search-form {
+        flex-direction: column;
+    }
+
+    .search-form button {
+        width: 100%;
+    }
 }

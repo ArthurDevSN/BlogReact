@@ -13,7 +13,7 @@ const Navbar = () => {
   const {logout} = useAuthentication();
 
   return (
-    <nav className={styles.navbar}>
+    <nav className={styles.navbar} aria-label="Navegação principal">
       <NavLink to="/" className={styles.brand}>
         mini <span>Blog</span>
       </NavLink>

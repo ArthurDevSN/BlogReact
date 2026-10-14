@@ -3,11 +3,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-wrap: anywhere;
+}
+
+.about h2 {
+    font-size: clamp(1.35rem, 5vw, 1.5rem);
 }
 
 .about p{
     color: #aaa;
     margin-bottom: 2em;
+    max-width: 42rem;
+    line-height: 1.6;
 }
 
 .about a{

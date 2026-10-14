@@ -1,15 +1,21 @@
 .edit_post {
     text-align: center;
+    overflow-wrap: anywhere;
 }
 
 .edit_post h2 {
-    font-size: 2.2em;
+    font-size: clamp(1.65rem, 6vw, 2.2rem);
 }
 
 .edit_post p {
     color: #aaa;
     margin-bottom: 2em;
     text-indent: 2em;
+    line-height: 1.6;
+}
+
+.edit_post form p {
+    text-indent: 0;
 }
 
 .edit_post label {
@@ -23,6 +29,18 @@
 }
 
 .image_preview{
+    display: block;
     max-width: 100%;
-    margin-bottom: 1em;
+    height: auto;
+    margin: 0 auto 1em;
+}
+
+@media (max-width: 600px) {
+    .edit_post p {
+        text-indent: 0;
+    }
+
+    .edit_post form button {
+        width: 100%;
+    }
 }

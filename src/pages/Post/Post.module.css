@@ -1,5 +1,22 @@
 .post_container { 
     text-align: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow-wrap: anywhere;
+}
+
+.post_container img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 8px;
+}
+
+.post_container > p {
+    line-height: 1.6;
+    white-space: pre-wrap;
 }
 
 .post_container h3 {
@@ -8,11 +25,14 @@
 
 .post_container .tags{
     display:flex;
+    flex-wrap: wrap;
     justify-content: center;
+    gap: 0.5em 1em;
 }
 
 .tags p{
-    margin-right: 1em;
+    max-width: 100%;
+    margin: 0;
 }
 
 .tags span{
