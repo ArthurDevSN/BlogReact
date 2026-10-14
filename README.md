@@ -1,70 +1,74 @@
-# Getting Started with Create React App
+# MiniBlog
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Blog em português feito com React 19, React Router 7 e Firebase (Authentication e Firestore). Permite ler e buscar posts por tag, criar uma conta e gerenciar os próprios posts.
 
-## Available Scripts
+## Executar localmente
 
-In the project directory, you can run:
+Requer Node.js 20 ou superior e npm. A validação deste projeto usa Node.js 24.
 
-### `npm start`
+```sh
+npm ci
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Abra http://localhost:3000. O projeto mantém a configuração pública original do Firebase. Para usar outro projeto, copie `.env.example` para `.env.local`, preencha as variáveis `REACT_APP_FIREBASE_*` e reinicie o servidor. Habilite o provedor E-mail/Senha no Firebase Authentication e crie um banco Firestore.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+As variáveis `REACT_APP_*` são incluídas no JavaScript entregue ao navegador. Use apenas a configuração pública do aplicativo web; credenciais administrativas e chaves de conta de serviço não pertencem a esses arquivos. A autorização dos dados é feita pelas regras do Firestore.
 
-### `npm test`
+## Verificação
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```sh
+npm run lint
+npm run test:ci
+CI=true npm run build
+```
 
-### `npm run build`
+Os testes usam mocks do Firebase e não escrevem no banco remoto. Cobrem autenticação, rotas protegidas, confirmação de salvamento, propriedade dos posts, falhas de consulta, limpeza de listeners, respostas antigas e busca por tags. A configuração Jest contém um mapeamento para o subpath `react-router/dom`, necessário para o Jest 27 incluído no Create React App.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+O workflow `.github/workflows/ci.yml` executa lint, testes e build em pushes e pull requests. O comando `npm test` continua disponível em modo interativo.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Para verificar as regras com um emulador Firestore local, instale a CLI Firebase e Java e execute:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```sh
+firebase emulators:exec --only firestore --project demo-miniblog-review "node scripts/test-firestore-rules.cjs"
+```
 
-### `npm run eject`
+O script recusa hosts remotos e projetos que não comecem com `demo-`. Ele verifica acesso público, propriedade, schema, timestamps e proteção das demais coleções. A execução do emulador exige baixar um JAR de `storage.googleapis.com`; essa validação não foi executada neste ambiente porque esse download foi bloqueado pela política de rede.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Dados e autorização
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Os posts ficam na coleção **`post`** (singular), com os campos:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+| Campo | Tipo / limite |
+| --- | --- |
+| `title` | Texto obrigatório, até 200 caracteres |
+| `image` | URL HTTP ou HTTPS, até 2.048 caracteres |
+| `body` | Texto obrigatório, até 50.000 caracteres |
+| `tagsArray` | De 1 a 20 tags únicas, até 50 caracteres cada |
+| `uid` | Identificador do autor no Firebase Authentication |
+| `createdBy` | Nome do autor, de 1 a 80 caracteres |
+| `createdAt` | Timestamp gerado pelo servidor na criação |
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+O formulário remove espaços nas extremidades e normaliza as tags para minúsculas. A busca usa uma tag exata, sem distinguir maiúsculas após essa normalização; os resultados são ordenados do mais recente para o mais antigo. O feed também ordena por `createdAt`.
 
-## Learn More
+Resultados recebidos do cache são identificados na interface. Um cache vazio aguarda a confirmação do servidor antes de afirmar que não existem posts.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+`firestore.rules` permite leitura pública e exige autenticação para criar posts com o próprio `uid`. Somente o autor pode editar ou excluir. Edições preservam autor, nome do autor e data de criação. As demais coleções ficam sem acesso por essas regras. `firestore.indexes.json` declara os índices compostos usados pela busca e pelo dashboard.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+As regras e os índices precisam ser publicados no projeto Firebase escolhido para entrar em vigor. Com a CLI Firebase instalada e autenticada, selecione o projeto correto e execute:
 
-### Code Splitting
+```sh
+firebase deploy --only firestore:rules,firestore:indexes
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+A publicação dos índices pode levar alguns minutos. Dados antigos sem `createdAt` não aparecem em consultas ordenadas por esse campo. Antes de publicar as regras em um banco existente, revise posts antigos com campos ausentes, nomes vazios ou campos adicionais, pois eles podem exigir adequação ao schema para permitir edição. Este trabalho não migra dados remotos automaticamente.
 
-### Analyzing the Bundle Size
+## Build e hospedagem
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+`npm run build` gera os arquivos estáticos em `build/`. O `firebase.json` já contém a regra de reescrita das rotas para `index.html`, permitindo abrir URLs internas diretamente no Firebase Hosting.
 
-### Making a Progressive Web App
+Nenhum deploy é feito pelos comandos de validação ou pelo workflow de CI.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Dependências
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+O projeto ainda utiliza Create React App 5, que inclui ferramentas antigas. Atualizações compatíveis foram aplicadas ao lockfile; ainda existem alertas transitivos no `npm audit`. A migração do build e dos testes para ferramentas mantidas deve ser tratada em uma mudança própria. Evite `npm audit fix --force`: as sugestões atuais incluem remover o funcionamento do `react-scripts` e fazer downgrade do Firebase.

@@ -3,12 +3,12 @@
     overflow-wrap: anywhere;
 }
 
-.edit_post h2 {
+.edit_post h1 {
     font-size: clamp(1.65rem, 6vw, 2.2rem);
 }
 
 .edit_post p {
-    color: #aaa;
+    color: #626b73;
     margin-bottom: 2em;
     text-indent: 2em;
     line-height: 1.6;

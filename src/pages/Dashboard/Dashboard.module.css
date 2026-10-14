@@ -8,7 +8,7 @@
     overflow-wrap: anywhere;
 }
 
-.dashboard h2{
+.dashboard h1{
     font-size: 2.2em;
     margin-bottom: 0.5em;
 }
@@ -89,7 +89,7 @@
 }
 
 @media (max-width: 640px) {
-    .dashboard h2 {
+    .dashboard h1 {
         font-size: 1.8em;
     }
 

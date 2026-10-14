@@ -1,50 +1,44 @@
-import { useState, useEffect } from "react";
-import { db } from "../firebase/config"
-import { doc, getDoc} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { firestoreError } from "../utils/firestoreError";
 
+export const useFetchDocument = (docCollection, id) => {
+  const [document, setDocument] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-export const useFetchDocument = (docCollection,id) => {
+  useEffect(() => {
+    let active = true;
 
-    const [document, setDocument] = useState(null)
-    const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(null)
+    setDocument(null);
+    setError(null);
+    setLoading(true);
 
-    // deal with memory leak
-    const [cancelled, setCancelled] = useState(false)
+    const loadDocument = async () => {
+      try {
+        if (!id) return;
 
-    useEffect(() => {
+        const snapshot = await getDoc(doc(db, docCollection, id));
+        if (!active) return;
 
-        async function loadDocument() {
-            if (cancelled) return
+        if (!snapshot.exists()) return;
 
-            setLoading(true)
+        setDocument({ ...snapshot.data(), id: snapshot.id });
+      } catch (fetchError) {
+        if (!active) return;
+        setError(firestoreError(fetchError, "Não foi possível carregar o post. Tente novamente."));
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
 
-            try {
+    loadDocument();
 
-                const docRef = await doc(db, docCollection, id)
+    return () => {
+      active = false;
+    };
+  }, [docCollection, id]);
 
-                const docSnap = await getDoc(docRef)
-
-                setDocument(docSnap.data());
-
-                setLoading(false);
-
-            } catch (error) {
-                console.log(error);
-                setError(error.message);
-
-                setLoading(false);
-            }
-        }
-
-        loadDocument();
-
-    }, [docCollection, id, cancelled]);
-
-    useEffect(() => {
-        return () => setCancelled(true);
-    }, []);
-
-    return { document, loading, error };
-}
-
+  return { document, loading, error };
+};

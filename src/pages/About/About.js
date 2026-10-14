@@ -7,11 +7,11 @@ import { Link } from 'react-router-dom';
 const About = () => {
   return (
     <div className={styles.about}>
-        <h2>
+        <h1>
           Sobre o Mini <span>Blog</span>
-          </h2>
+          </h1>
           <p>
-            Este o projeto consiste em um blog feito com React no front-end e Firebase no back-end.
+            O MiniBlog é um espaço para compartilhar histórias e conhecimento, feito com React e Firebase.
           </p>
           <Link to="/posts/create" className="btn">
             Criar Post

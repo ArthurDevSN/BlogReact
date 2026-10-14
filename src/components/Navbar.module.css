@@ -44,6 +44,14 @@
     color: #fff;
 }
 
+.logout_error {
+    margin: 0;
+    padding: 12px 24px;
+    color: #721c24;
+    background: #f8d7da;
+    text-align: center;
+}
+
 @media (max-width: 640px) {
     .navbar {
         flex-direction: column;

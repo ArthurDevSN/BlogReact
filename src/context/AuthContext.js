@@ -1,14 +1,15 @@
 import { useContext, createContext } from "react";
 
-const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
-export function AuthProvider({children, value}){
-    return <AuthContext.Provider value={value}>
-
-        {children}
-    </AuthContext.Provider>
+export function AuthProvider({ children, value }) {
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuthValue(){
-    return useContext(AuthContext);
+export function useAuthValue() {
+    const context = useContext(AuthContext);
+    if (context === null) {
+        throw new Error("useAuthValue deve ser usado dentro de AuthProvider.");
+    }
+    return context;
 }

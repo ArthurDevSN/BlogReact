@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "MiniBlog",
+  "name": "MiniBlog — histórias e conhecimento",
   "icons": [
     {
       "src": "favicon.ico",
